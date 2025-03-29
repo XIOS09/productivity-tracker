@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Time Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --primary-light: #4d9eff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --sleep-color: #7209b7;
+            --light: #f8f9fa;
+            --dark: #1a1a2e;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 32px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .header p {
+            color: var(--gray);
+        }
+        
+        .sleep-section {
+            background-color: rgba(114, 9, 183, 0.05);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--light-gray);
+        }
+        
+        .sleep-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--sleep-color);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .sleep-inputs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .time-input {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .time-input label {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 6px;
+        }
+        
+        .time-select {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 12px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .time-select:hover {
+            border-color: var(--primary-light);
+        }
+        
+        .time-select i {
+            color: var(--gray);
+            margin-right: 8px;
+        }
+        
+        .time-select span {
+            flex: 1;
+            font-size: 16px;
+        }
+        
+        .time-select .dropdown-icon {
+            margin-right: 0;
+            margin-left: 8px;
+            transition: transform 0.2s ease;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 4px;
+        }
+        
+        .dropdown-menu.open {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light);
+        }
+        
+        .sleep-duration-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+            color: var(--sleep-color);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .sleep-duration-info i {
+            color: var(--sleep-color);
+        }
+        
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+        
+        .time-card {
+            padding: 12px 8px;
+            background-color: white;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .time-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+        
+        .time-card.selected-start {
+            background-color: rgba(58, 134, 255, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .time-card.selected-end {
+            background-color: rgba(255, 0, 110, 0.1);
+            border-color: var(--accent);
+        }
+        
+        .time-card.sleeping {
+            background-color: rgba(114, 9, 183, 0.05);
+            border-color: rgba(114, 9, 183, 0.2);
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .result-section {
+            padding: 20px;
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+        }
+        
+        .result-title {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--dark);
+        }
+        
+        .result-time {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .result-duration {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            padding: 12px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .sleep-duration {
+            font-size: 14px;
+            color: var(--sleep-color);
+            text-align: center;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .clear-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #f8f9fa;
+            color: var(--gray);
+        }
+        
+        .clear-button:hover {
+            background-color: var(--light-gray);
+            box-shadow: var(--shadow-hover);
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .time-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .container {
+                padding: 24px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .time-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .container {
+                padding: 16px;
+            }
+            
+            .time-card {
+                padding: 10px 6px;
+                font-size: 13px;
+            }
+            
+            .result-time {
+                font-size: 18px;
+            }
+            
+            .result-duration {
+                font-size: 20px;
+            }
+            
+            .sleep-inputs {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> Productivity Time Tracker</h1>
+            <p>Track your working hours excluding sleep time</p>
+        </div>
+        
+        <div class="sleep-section">
+            <div class="sleep-title">
+                <i class="fas fa-moon"></i>
+                <span>Sleep Schedule</span>
+            </div>
+            <div class="sleep-inputs">
+                <div class="time-input">
+                    <label>Sleep Time</label>
+                    <div class="time-select" id="sleepTimeSelect">
+                        <i class="fas fa-moon"></i>
+                        <span>23:00</span>
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </div>
+                    <div class="dropdown-menu" id="sleepTimeMenu">
+                        <!-- Options will be added via JS -->
+                    </div>
+                </div>
+                <div class="time-input">
+                    <label>Wake Up Time</label>
+                    <div class="time-select" id="wakeTimeSelect">
+                        <i class="fas fa-sun"></i>
+                        <span>07:00</span>
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </div>
+                    <div class="dropdown-menu" id="wakeTimeMenu">
+                        <!-- Options will be added via JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="sleep-duration-info">
+                <i class="fas fa-bed"></i>
+                <span id="sleepDurationInfo">8 hours of sleep scheduled</span>
+            </div>
+        </div>
+        
+        <div class="time-grid" id="timeGrid">
+            <!-- Time cards will be generated dynamically -->
+        </div>
+        
+        <div class="result-section">
+            <div class="result-title">
+                <i class="fas fa-briefcase"></i>
+                <span>Productive Hours</span>
+            </div>
+            <div id="selectedTimes" class="result-time">Select working hours</div>
+            <div id="timeDifference" class="result-duration">—</div>
+            <div id="sleepDuration" class="sleep-duration" style="display: none;">
+                <i class="fas fa-moon"></i>
+                <span id="sleepHoursText">8 hours excluded for sleep</span>
+            </div>
+        </div>
+        
+        <button id="clearBtn" class="clear-button">
+            <i class="fas fa-undo-alt"></i> Reset
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timeGrid = document.getElementById('timeGrid');
+            const selectedTimesDisplay = document.getElementById('selectedTimes');
+            const timeDifferenceDisplay = document.getElementById('timeDifference');
+            const clearBtn = document.getElementById('clearBtn');
+            const sleepDurationElement = document.getElementById('sleepDuration');
+            const sleepHoursText = document.getElementById('sleepHoursText');
+            const sleepDurationInfo = document.getElementById('sleepDurationInfo');
+            
+            // Time select elements
+            const sleepTimeSelect = document.getElementById('sleepTimeSelect');
+            const wakeTimeSelect = document.getElementById('wakeTimeSelect');
+            const sleepTimeMenu = document.getElementById('sleepTimeMenu');
+            const wakeTimeMenu = document.getElementById('wakeTimeMenu');
+            
+            let startTime = null;
+            let endTime = null;
+            let sleepStart = 23; // 23:00 as default (hour)
+            let sleepMinutes = 0; // 0 mins by default
+            let sleepEnd = 7;    // 7:00 as default (hour)
+            let wakeMinutes = 0;  // 0 mins by default
+            
+            // Generate 30-minute interval options for dropdowns
+            function generateTimeIntervals() {
+                const intervals = [];
+                for (let hour = 0; hour < 24; hour++) {
+                    intervals.push(formatTime(hour, 0)); // Hour:00
+                    intervals.push(formatTime(hour, 30)); // Hour:30
+                }
+                return intervals;
+            }
+            
+            function formatTime(hours, minutes) {
+                const padHours = hours.toString().padStart(2, '0');
+                const padMinutes = minutes.toString().padStart(2, '0');
+                return `${padHours}:${padMinutes}`;
+            }
+            
+            function populateDropdown(menu, intervals) {
+                menu.innerHTML = '';
+                intervals.forEach(time => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.textContent = time;
+                    item.dataset.time = time;
+                    menu.appendChild(item);
+                    
+                    item.addEventListener('click', function() {
+                        const parentInput = this.closest('.time-input');
+                        const select = parentInput.querySelector('.time-select');
+                        select.querySelector('span').textContent = this.textContent;
+                        
+                        const icon = select.querySelector('.dropdown-icon');
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                        
+                        const currentMenu = parentInput.querySelector('.dropdown-menu');
+                        currentMenu.classList.remove('open');
+                        
+                        // Update the sleep times
+                        if (parentInput.contains(sleepTimeSelect)) {
+                            const [hours, minutes] = this.textContent.split(':').map(Number);
+                            sleepStart = hours;
+                            sleepMinutes = minutes;
+                        } else {
+                            const [hours, minutes] = this.textContent.split(':').map(Number);
+                            sleepEnd = hours;
+                            wakeMinutes = minutes;
+                        }
+                        
+                        // Update the sleep duration display
+                        updateSleepDuration();
+                        
+                        generateTimeCards();
+                        if (startTime !== null && endTime !== null) {
+                            calculateDifference();
+                        }
+                    });
+                });
+            }
+            
+            // Calculate and display sleep duration
+            function updateSleepDuration() {
+                const duration = calculateSleepDuration();
+                const hours = Math.floor(duration);
+                const minutes = Math.round((duration - hours) * 60);
+                
+                let durationText;
+                
+                if (minutes === 0) {
+                    durationText = hours === 1 ? 
+                        `${hours} hour of sleep scheduled` : 
+                        `${hours} hours of sleep scheduled`;
+                } else {
+                    durationText = `${hours}h ${minutes}m of sleep scheduled`;
+                }
+                
+                sleepDurationInfo.textContent = durationText;
+            }
+            
+            // Calculate exact sleep duration in hours
+            function calculateSleepDuration() {
+                // Convert to decimal hours for calculation
+                const currentSleepStart = sleepStart + sleepMinutes / 60;
+                let currentSleepEnd = sleepEnd + wakeMinutes / 60;
+                
+                // Handle overnight sleep (e.g., 23:30-7:30)
+                if (currentSleepStart > currentSleepEnd) {
+                    currentSleepEnd += 24; // Add 24 hours to the end time
+                }
+                
+                const duration = currentSleepEnd - currentSleepStart;
+                return duration;
+            }
+            
+            // Initialize dropdowns
+            const timeIntervals = generateTimeIntervals();
+            populateDropdown(sleepTimeMenu, timeIntervals);
+            populateDropdown(wakeTimeMenu, timeIntervals);
+            
+            // Set initial sleep duration
+            updateSleepDuration();
+            
+            // Toggle dropdown menus
+            sleepTimeSelect.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const icon = this.querySelector('.dropdown-icon');
+                sleepTimeMenu.classList.toggle('open');
+                
+                if (sleepTimeMenu.classList.contains('open')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+                
+                // Close the other dropdown if open
+                if (wakeTimeMenu.classList.contains('open')) {
+                    wakeTimeMenu.classList.remove('open');
+                    wakeTimeSelect.querySelector('.dropdown-icon').classList.remove('fa-chevron-up');
+                    wakeTimeSelect.querySelector('.dropdown-icon').classList.add('fa-chevron-down');
+                }
+            });
+            
+            wakeTimeSelect.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const icon = this.querySelector('.dropdown-icon');
+                wakeTimeMenu.classList.toggle('open');
+                
+                if (wakeTimeMenu.classList.contains('open')) {
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+                
+                // Close the other dropdown if open
+                if (sleepTimeMenu.classList.contains('open')) {
+                    sleepTimeMenu.classList.remove('open');
+                    sleepTimeSelect.querySelector('.dropdown-icon').classList.remove('fa-chevron-up');
+                    sleepTimeSelect.querySelector('.dropdown-icon').classList.add('fa-chevron-down');
+                }
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                sleepTimeMenu.classList.remove('open');
+                wakeTimeMenu.classList.remove('open');
+                sleepTimeSelect.querySelector('.dropdown-icon').classList.remove('fa-chevron-up');
+                sleepTimeSelect.querySelector('.dropdown-icon').classList.add('fa-chevron-down');
+                wakeTimeSelect.querySelector('.dropdown-icon').classList.remove('fa-chevron-up');
+                wakeTimeSelect.querySelector('.dropdown-icon').classList.add('fa-chevron-down');
+            });
+            
+            generateTimeCards();
+            
+            clearBtn.addEventListener('click', function() {
+                startTime = null;
+                endTime = null;
+                clearSelection();
+                selectedTimesDisplay.textContent = 'Select working hours';
+                timeDifferenceDisplay.textContent = '—';
+                sleepDurationElement.style.display = 'none';
+            });
+            
+            function parseTimeInput() {
+                // Sleep and wake times are already in numeric format
+            }
+            
+            function generateTimeCards() {
+                timeGrid.innerHTML = '';
+                
+                // Generate 24 hour cards (00:00 to 23:00)
+                for (let hour = 0; hour < 24; hour++) {
+                    const formattedTime = hour.toString().padStart(2, '0') + ':00';
+                    const timeCard = document.createElement('div');
+                    timeCard.className = 'time-card';
+                    timeCard.dataset.hour = hour;
+                    timeCard.textContent = formattedTime;
+                    
+                    // Check if this hour is during sleep time
+                    const isSleeping = isHourInSleepPeriod(hour);
+                    if (isSleeping) {
+                        timeCard.classList.add('sleeping');
+                    }
+                    
+                    if (!isSleeping) {
+                        timeCard.addEventListener('click', function() {
+                            const hourValue = parseInt(this.dataset.hour);
+                            
+                            if (startTime === null) {
+                                startTime = hourValue;
+                            } else if (endTime === null && hourValue !== startTime) {
+                                // Ensure end time is after start time
+                                if ((hourValue > startTime || (startTime >= 23 && hourValue === 0))) {
+                                    endTime = hourValue;
+                                } else {
+                                    // Swap if end is before start
+                                    const temp = startTime;
+                                    startTime = hourValue;
+                                    endTime = temp;
+                                }
+                            } else {
+                                // If both times are selected, clicking will reset one of them
+                                const distanceToStart = Math.abs(hourValue - startTime);
+                                const distanceToEnd = endTime !== null ? Math.abs(hourValue - endTime) : Infinity;
+                                
+                                if (distanceToStart < distanceToEnd) {
+                                    startTime = hourValue;
+                                } else {
+                                    endTime = hourValue;
+                                }
+                                
+                                // Ensure chronological order
+                                if (startTime !== null && endTime !== null && endTime < startTime) {
+                                    const temp = startTime;
+                                    startTime = endTime;
+                                    endTime = temp;
+                                }
+                            }
+                            
+                            updateSelection();
+                            calculateDifference();
+                        });
+                    }
+                    
+                    timeGrid.appendChild(timeCard);
+                }
+            }
+            
+            function isHourInSleepPeriod(hour) {
+                const currentSleepStart = sleepStart + sleepMinutes / 60;
+                const currentSleepEnd = sleepEnd + wakeMinutes / 60;
+                
+                // Handle overnight sleep (e.g., 23:30-7:30)
+                if (currentSleepStart > currentSleepEnd) {
+                    // Sleep spans midnight
+                    return (hour + 0.5) >= currentSleepStart || (hour + 0.0) < currentSleepEnd;
+                } else {
+                    // Sleep within same day
+                    return (hour + 0.5) >= currentSleepStart && (hour + 0.0) < currentSleepEnd;
+                }
+            }
+            
+            function updateSelection() {
+                document.querySelectorAll('.time-card').forEach(card => {
+                    card.classList.remove('selected-start', 'selected-end');
+                    
+                    if (startTime !== null && parseInt(card.dataset.hour) === startTime) {
+                        card.classList.add('selected-start');
+                    }
+                    
+                    if (endTime !== null && parseInt(card.dataset.hour) === endTime) {
+                        card.classList.add('selected-end');
+                    }
+                });
+            }
+            
+            function clearSelection() {
+                document.querySelectorAll('.time-card').forEach(card => {
+                    card.classList.remove('selected-start', 'selected-end');
+                });
+            }
+            
+            function calculateDifference() {
+                if (startTime === null || endTime === null) {
+                    return;
+                }
+                
+                const start24 = startTime.toString().padStart(2, '0') + ':00';
+                const end24 = endTime.toString().padStart(2, '0') + ':00';
+                
+                selectedTimesDisplay.innerHTML = `
+                    <span>${start24}</span>
+                    <i class="fas fa-arrow-right" style="margin: 0 8px;"></i>
+                    <span>${end24}</span>
+                `;
+                
+                // Calculate total raw hours
+                let totalRawHours = endTime - startTime;
+                if (totalRawHours < 0) {
+                    totalRawHours += 24;
+                }
+                
+                // Calculate sleep hours in the selected range
+                const sleepHours = calculateSleepHoursInRange(startTime, endTime);
+                
+                // Calculate productive hours (total - sleep hours)
+                const productiveHours = totalRawHours - sleepHours;
+                
+                let durationText;
+                
+                if (productiveHours <= 0) {
+                    durationText = '0 hours';
+                } else if (productiveHours === 1) {
+                    durationText = '1 hour';
+                } else {
+                    durationText = `${productiveHours.toFixed(1)} hours`;
+                }
+                
+                timeDifferenceDisplay.textContent = durationText;
+                
+                // Show sleep hours info if relevant
+                if (sleepHours > 0) {
+                    sleepHoursText.textContent = sleepHours === 1 ? 
+                        `${sleepHours} hour excluded for sleep` : 
+                        `${sleepHours} hours excluded for sleep`;
+                    sleepDurationElement.style.display = 'flex';
+                } else {
+                    sleepDurationElement.style.display = 'none';
+                }
+            }
+            
+            function calculateSleepHoursInRange(rangeStart, rangeEnd) {
+                let sleepHours = 0;
+                
+                // Iterate through each hour in the work range
+                for (let hour = rangeStart; hour < rangeEnd; hour++) {
+                    const normalizedHour = hour % 24;
+                    if (isHourInSleepPeriod(normalizedHour)) {
+                        sleepHours += 1;
+                    }
+                }
+                
+                // Handle overnight work ranges
+                if (rangeStart > rangeEnd) {
+                    for (let hour = 0; hour < rangeEnd; hour++) {
+                        if (isHourInSleepPeriod(hour)) {
+                            sleepHours += 1;
+                        }
+                    }
+                }
+                
+                return sleepHours;
+            }
+        });
+    </script>
+</body>
+</html>
