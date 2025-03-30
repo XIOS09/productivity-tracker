@@ -67,6 +67,82 @@
             color: var(--gray);
         }
         
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .time-card {
+            padding: 12px 8px;
+            background-color: white;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .time-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+        
+        .time-card.selected-start {
+            background-color: rgba(58, 134, 255, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .time-card.selected-end {
+            background-color: rgba(255, 0, 110, 0.1);
+            border-color: var(--accent);
+        }
+        
+        .time-card.sleeping {
+            background-color: rgba(114, 9, 183, 0.05);
+            border-color: rgba(114, 9, 183, 0.2);
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .result-section {
+            padding: 20px;
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+        }
+        
+        .result-title {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--dark);
+        }
+        
+        .result-time {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .result-duration {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            padding: 12px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
         .sleep-section {
             background-color: rgba(114, 9, 183, 0.05);
             border-radius: var(--border-radius);
@@ -153,7 +229,7 @@
         
         .dropdown-menu.open {
             display: block;
-        }
+}
         
         .dropdown-item {
             padding: 10px 12px;
@@ -181,82 +257,6 @@
         
         .sleep-duration-info i {
             color: var(--sleep-color);
-        }
-        
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            margin-bottom: 32px;
-        }
-        
-        .time-card {
-            padding: 12px 8px;
-            background-color: white;
-            border: 2px solid var(--light-gray);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .time-card:hover {
-            border-color: var(--primary-light);
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-        }
-        
-        .time-card.selected-start {
-            background-color: rgba(58, 134, 255, 0.1);
-            border-color: var(--primary);
-        }
-        
-        .time-card.selected-end {
-            background-color: rgba(255, 0, 110, 0.1);
-            border-color: var(--accent);
-        }
-        
-        .time-card.sleeping {
-            background-color: rgba(114, 9, 183, 0.05);
-            border-color: rgba(114, 9, 183, 0.2);
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .result-section {
-            padding: 20px;
-            background-color: var(--light);
-            border-radius: var(--border-radius);
-            margin-bottom: 24px;
-        }
-        
-        .result-title {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--dark);
-        }
-        
-        .result-time {
-            font-size: 20px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        
-        .result-duration {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            text-align: center;
-            padding: 12px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
         }
         
         .sleep-duration {
@@ -340,6 +340,23 @@
             <p>Track your working hours excluding sleep time</p>
         </div>
         
+        <div class="time-grid" id="timeGrid">
+            <!-- Time cards will be generated dynamically -->
+        </div>
+        
+        <div class="result-section">
+            <div class="result-title">
+                <i class="fas fa-briefcase"></i>
+                <span>Productive Hours</span>
+            </div>
+            <div id="selectedTimes" class="result-time">Select working hours</div>
+            <div id="timeDifference" class="result-duration">—</div>
+            <div id="sleepDuration" class="sleep-duration" style="display: none;">
+                <i class="fas fa-moon"></i>
+                <span id="sleepHoursText">8 hours excluded for sleep</span>
+            </div>
+        </div>
+        
         <div class="sleep-section">
             <div class="sleep-title">
                 <i class="fas fa-moon"></i>
@@ -372,23 +389,6 @@
             <div class="sleep-duration-info">
                 <i class="fas fa-bed"></i>
                 <span id="sleepDurationInfo">8 hours of sleep scheduled</span>
-            </div>
-        </div>
-        
-        <div class="time-grid" id="timeGrid">
-            <!-- Time cards will be generated dynamically -->
-        </div>
-        
-        <div class="result-section">
-            <div class="result-title">
-                <i class="fas fa-briefcase"></i>
-                <span>Productive Hours</span>
-            </div>
-            <div id="selectedTimes" class="result-time">Select working hours</div>
-            <div id="timeDifference" class="result-duration">—</div>
-            <div id="sleepDuration" class="sleep-duration" style="display: none;">
-                <i class="fas fa-moon"></i>
-                <span id="sleepHoursText">8 hours excluded for sleep</span>
             </div>
         </div>
         
