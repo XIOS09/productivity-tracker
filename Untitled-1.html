@@ -7,337 +7,339 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #3a86ff;
-            --primary-light: #4d9eff;
-            --secondary: #8338ec;
-            --accent: #ff006e;
-            --sleep-color: #7209b7;
-            --light: #f8f9fa;
-            --dark: #1a1a2e;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-            --border-radius: 12px;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f5f7ff;
-            color: var(--dark);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            padding: 32px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        
-        .header h1 {
-            color: var(--primary);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .header p {
-            color: var(--gray);
-        }
-        
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-        
-        .time-card {
-            padding: 12px 8px;
-            background-color: white;
-            border: 2px solid var(--light-gray);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .time-card:hover {
-            border-color: var(--primary-light);
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
-        }
-        
-        .time-card.selected-start {
-            background-color: rgba(58, 134, 255, 0.1);
-            border-color: var(--primary);
-        }
-        
-        .time-card.selected-end {
-            background-color: rgba(255, 0, 110, 0.1);
-            border-color: var(--accent);
-        }
-        
-        .time-card.sleeping {
-            background-color: rgba(114, 9, 183, 0.05);
-            border-color: rgba(114, 9, 183, 0.2);
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .result-section {
-            padding: 20px;
-            background-color: var(--light);
-            border-radius: var(--border-radius);
-            margin-bottom: 24px;
-        }
-        
-        .result-title {
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: var(--dark);
-        }
-        
-        .result-time {
-            font-size: 20px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        
-        .result-duration {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            text-align: center;
-            padding: 12px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-        }
-        
-        .sleep-section {
-            background-color: rgba(114, 9, 183, 0.05);
-            border-radius: var(--border-radius);
-            padding: 16px;
-            margin-bottom: 24px;
-            border: 1px solid var(--light-gray);
-        }
-        
-        .sleep-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--sleep-color);
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-        
-        .sleep-inputs {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 12px;
-        }
-        
-        .time-input {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-        
-        .time-input label {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 6px;
-        }
-        
-        .time-select {
-            display: flex;
-            align-items: center;
-            background: white;
-            padding: 10px 12px;
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-        
-        .time-select:hover {
-            border-color: var(--primary-light);
-        }
-        
-        .time-select i {
-            color: var(--gray);
-            margin-right: 8px;
-        }
-        
-        .time-select span {
-            flex: 1;
-            font-size: 16px;
-        }
-        
-        .time-select .dropdown-icon {
-            margin-right: 0;
-            margin-left: 8px;
-            transition: transform 0.2s ease;
-        }
-        
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: white;
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            z-index: 10;
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-            margin-top: 4px;
-        }
-        
-        .dropdown-menu.open {
-            display: block;
+:root {
+    --primary: #00bcd4;
+    --primary-light: #33d9ec;
+    --secondary: #2471a3;
+    --accent: #ff4081;
+    --sleep-color: #2471a3;
+    --light: #e0e0e0;
+    --dark: #121212;
+    --gray: #9e9e9e;
+    --light-gray: #333333;
+    --border-radius: 12px;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.4);
 }
-        
-        .dropdown-item {
-            padding: 10px 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .dropdown-item:hover {
-            background-color: var(--light);
-        }
-        
-        .sleep-duration-info {
-            background-color: white;
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 14px;
-            color: var(--sleep-color);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 8px;
-        }
-        
-        .sleep-duration-info i {
-            color: var(--sleep-color);
-        }
-        
-        .sleep-duration {
-            font-size: 14px;
-            color: var(--sleep-color);
-            text-align: center;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        .clear-button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background-color: #f8f9fa;
-            color: var(--gray);
-        }
-        
-        .clear-button:hover {
-            background-color: var(--light-gray);
-            box-shadow: var(--shadow-hover);
-            color: var(--dark);
-        }
-        
-        @media (max-width: 768px) {
-            .time-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .container {
-                padding: 24px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .time-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .container {
-                padding: 16px;
-            }
-            
-            .time-card {
-                padding: 10px 6px;
-                font-size: 13px;
-            }
-            
-            .result-time {
-                font-size: 18px;
-            }
-            
-            .result-duration {
-                font-size: 20px;
-            }
-            
-            .sleep-inputs {
-                flex-direction: column;
-                gap: 12px;
-            }
-        }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0a0a0a;
+    color: var(--light);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    background: #1a1a1a;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    padding: 32px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.header h1 {
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.header p {
+    color: var(--gray);
+}
+
+.time-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.time-card {
+    padding: 12px 8px;
+    background-color: #222222;
+    border: 2px solid var(--light-gray);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--light);
+}
+
+.time-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.time-card.selected-start {
+    background-color: rgba(0, 188, 212, 0.25);
+    border-color: var(--primary);
+}
+
+.time-card.selected-end {
+    background-color: rgba(255, 64, 129, 0.25);
+    border-color: var(--accent);
+}
+
+.time-card.sleeping {
+    background-color: rgba(36, 113, 163, 0.2);
+    border-color: rgba(36, 113, 163, 0.3);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.result-section {
+    padding: 20px;
+    background-color: #202020;
+    border-radius: var(--border-radius);
+    margin-bottom: 24px;
+}
+
+.result-title {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--light);
+}
+
+.result-time {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.result-duration {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: 12px;
+    background-color: #242424;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.sleep-section {
+    background-color: rgba(36, 113, 163, 0.1);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin-bottom: 24px;
+    border: 1px solid #383838;
+}
+
+.sleep-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--sleep-color);
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.sleep-inputs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.time-input {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.time-input label {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 6px;
+}
+
+.time-select {
+    display: flex;
+    align-items: center;
+    background: #242424;
+    padding: 10px 12px;
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    color: var(--light);
+}
+
+.time-select:hover {
+    border-color: var(--primary-light);
+}
+
+.time-select i {
+    color: var(--gray);
+    margin-right: 8px;
+}
+
+.time-select span {
+    flex: 1;
+    font-size: 16px;
+}
+
+.time-select .dropdown-icon {
+    margin-right: 0;
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #242424;
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    margin-top: 4px;
+    color: var(--light);
+}
+
+.dropdown-menu.open {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #303030;
+}
+
+.sleep-duration-info {
+    background-color: #242424;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--sleep-color);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.sleep-duration-info i {
+    color: var(--sleep-color);
+}
+
+.sleep-duration {
+    font-size: 14px;
+    color: var(--sleep-color);
+    text-align: center;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.clear-button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #2d2d2d;
+    color: var(--gray);
+}
+
+.clear-button:hover {
+    background-color: #383838;
+    box-shadow: var(--shadow-hover);
+    color: var(--light);
+}
+
+@media (max-width: 768px) {
+    .time-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .container {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .time-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .container {
+        padding: 16px;
+    }
+    
+    .time-card {
+        padding: 10px 6px;
+        font-size: 13px;
+    }
+    
+    .result-time {
+        font-size: 18px;
+    }
+    
+    .result-duration {
+        font-size: 20px;
+    }
+    
+    .sleep-inputs {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-chart-line"></i> Productivity Time Tracker</h1>
-            <p>Track your working hours excluding sleep time</p>
         </div>
         
         <div class="time-grid" id="timeGrid">
@@ -349,7 +351,7 @@
                 <i class="fas fa-briefcase"></i>
                 <span>Productive Hours</span>
             </div>
-            <div id="selectedTimes" class="result-time">Select working hours</div>
+            <div id="selectedTimes" class="result-time"></div>
             <div id="timeDifference" class="result-duration">—</div>
             <div id="sleepDuration" class="sleep-duration" style="display: none;">
                 <i class="fas fa-moon"></i>
